@@ -31,7 +31,8 @@ module JavaBuildpack
 
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
-        credentials = @application.services.find_service(FILTER)['credentials']
+        custom_cups   = ENV[JBP_CONFIG_NEW_RELIC_CUPS]
+        credentials   = @application.services.find_service(custom_cups != nil ? custom_cups : FILTER)['credentials']
         java_opts   = @droplet.java_opts
         configuration = {}
 
@@ -59,7 +60,9 @@ module JavaBuildpack
 
       LICENSE_KEY_USER = 'license_key'.freeze
 
-      private_constant :FILTER, :LICENSE_KEY, :LICENSE_KEY_USER
+      JBP_CONFIG_NEW_RELIC_CUPS = 'JBP_CONFIG_NEW_RELIC_CUPS'.freeze
+
+      private_constant :FILTER, :LICENSE_KEY, :LICENSE_KEY_USER, :JBP_CONFIG_NEW_RELIC_CUPS
 
       def apply_configuration(credentials, configuration)
         configuration['log_file_name'] = 'STDOUT'

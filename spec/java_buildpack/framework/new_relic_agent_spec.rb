@@ -52,6 +52,17 @@ describe JavaBuildpack::Framework::NewRelicAgent do
       expect(sandbox + 'newrelic.yml').to exist
     end
 
+    it 'supports custom cups via env var override' do
+      ENV['JBP_CONFIG_NEW_RELIC_CUPS'] = 'custom-cups-name'
+      allow(java_home).to receive(:java_8_or_later?).and_return(JavaBuildpack::Util::TokenizedVersion.new('1.7.0_u10'))
+      expect(services).to receive(:find_service).with('custom-cups-name').and_return('credentials' => { 'licenseKey' => 'custom-cups-license-key' })  
+
+      component.release
+
+      # Unset after the test
+      ENV['JBP_CONFIG_NEW_RELIC_CUPS'] = nil
+    end
+
     it 'updates JAVA_OPTS' do
       allow(services).to receive(:find_service).and_return('credentials' => { 'licenseKey' => 'test-license-key' })
       allow(java_home).to receive(:java_8_or_later?).and_return(JavaBuildpack::Util::TokenizedVersion.new('1.7.0_u10'))
